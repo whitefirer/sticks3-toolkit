@@ -21,6 +21,7 @@ jobs:
           set -e
           . /opt/esp/idf/export.sh
           cd firmware
+          idf.py set-target esp32s3
           idf.py build
 
           # Merge into single binary for web-flash
