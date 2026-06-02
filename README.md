@@ -2,6 +2,12 @@
 
 M5Stack StickS3 硬件诊断与固件烧录工具集。
 
+## 截图
+
+| Web Flash | Device Screen |
+|-----------|---------------|
+| ![web-flash](docs/web-flash.png) | ![device](docs/device.png) |
+
 ## 功能
 
 - **I2C 总线扫描**：自动检测板上 I2C 设备（PMIC、BMI270 IMU 等）
