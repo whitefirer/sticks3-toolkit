@@ -1,0 +1,27 @@
+# ESP-IDF build
+firmware/build/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/managed_components/
+firmware/dependencies.lock
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Generated files (keep merged bin for web-flash)
+web-flash/*.bin
+!web-flash/sticks3-toolkit-merged.bin
+web-flash/fw-meta.json
+
+# OS
+.DS_Store
+Thumbs.db

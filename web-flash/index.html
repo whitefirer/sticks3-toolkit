@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StickS3 Toolkit</title>
+<style>
+:root {
+  --bg: #0a0a10; --panel: #13131f; --card: #1a1a2c; --border: #1f1f38;
+  --ink: #e4e4ee; --muted: #7c7c94; --accent: #e94560; --accent-glow: #ff6b81;
+  --green: #3ecf8e; --log-bg: #06060c;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color: var(--ink); background: var(--bg);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{-webkit-font-smoothing:antialiased}
+
+.topbar{position:sticky;top:0;z-index:10;padding:14px clamp(20px,5vw,64px);
+  border-bottom:1px solid var(--border);background:#0a0a10e0;backdrop-filter:blur(12px)}
+.topbar-inner{width:min(100%,1280px);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+
+.section-inner{width:min(100%,1280px);margin:0 auto;padding:clamp(20px,4vw,40px)}
+
+.hero{padding:clamp(30px,4vw,50px) 0 clamp(20px,3vw,30px);text-align:center}
+.hero h1{font-size:clamp(24px,3vw,40px);letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lead{max-width:640px;margin:10px auto 0;color:var(--muted);font-size:15px;line-height:1.5}
+
+.panels{display:grid;grid-template-columns:minmax(360px,1fr) minmax(360px,1fr);gap:clamp(20px,3vw,32px);padding-bottom:clamp(40px,6vw,80px)}
+.panel-card{padding:clamp(16px,3vw,24px);border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.panel-card h2{font-size:15px;color:var(--accent);margin-bottom:12px}
+
+button{font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  min-height:34px;padding:0 14px;border-radius:6px;font-size:13px;font-weight:600;
+  border:1px solid var(--border);color:var(--ink);background:var(--card);
+  transition:background .15s,border-color .15s}
+button:hover:not(:disabled){border-color:var(--accent)}
+button.primary{color:#fff;background:var(--accent);border-color:var(--accent)}
+button.primary:hover:not(:disabled){background:var(--accent-glow)}
+button.secondary{color:var(--ink);background:#252538;border:1px solid #3a3a55}
+button.secondary:hover:not(:disabled){background:#303050;border-color:#555}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.diag{color:var(--accent);border-color:var(--accent);background:transparent}
+button.diag:hover:not(:disabled){background:var(--accent);color:#fff}
+
+.fw-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.fw-row input{flex:1;background:var(--bg);color:var(--ink);border:1px solid var(--border);
+  border-radius:6px;padding:6px 10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+.fw-row input::placeholder{color:var(--muted)}
+.fw-row .file-btn{flex-shrink:0}
+
+.progress-track{width:100%;height:6px;margin:10px 0;overflow:hidden;border-radius:99px;background:#2a2a3e}
+.progress-track .fill{display:block;width:0;height:100%;border-radius:inherit;background:var(--accent);transition:width .3s ease}
+.progress-label{font-size:11px;color:var(--muted);text-align:right;margin-bottom:8px}
+
+.diag-section{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.diag-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.diag-row button{flex-shrink:0}
+.diag-sha{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--muted);
+  word-break:break-all;padding:6px 8px;background:var(--bg);border-radius:4px;margin-top:4px;line-height:1.4}
+
+.flash-log{min-height:100px;max-height:180px;margin-top:12px;padding:10px;overflow:auto;
+  border:1px solid var(--border);border-radius:8px;color:#a0b8d0;background:var(--log-bg);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;line-height:1.5}
+.flash-log .ok{color:var(--green)}.flash-log .err{color:var(--accent)}
+
+.serial-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.serial-controls select{background:var(--card);color:var(--ink);border:1px solid var(--border);
+  border-radius:6px;padding:5px 8px;font-size:13px;font:inherit}
+.serial-term{min-height:320px;max-height:440px;padding:10px;overflow:auto;
+  border:1px solid var(--border);border-radius:8px;color:#a0b8d0;background:var(--log-bg);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;
+  white-space:pre-wrap;word-break:break-all}
+.serial-input-line{display:flex;gap:8px;margin-top:10px}
+.serial-input-line input{flex:1;background:var(--card);color:var(--ink);
+  border:1px solid var(--border);border-radius:6px;padding:6px 10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+
+footer{padding:18px 0;border-top:1px solid var(--border);color:var(--muted);font-size:12px;text-align:center}
+footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:860px){.panels{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-dot"></span>StickS3 Toolkit</div>
+    <nav style="display:flex;gap:18px;font-size:13px">
+      <a href="https://github.com/whitefirer/sticks3-toolkit" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none">GitHub</a>
+      <a href="https://whitefirer.org" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="section-inner">
+      <h1>ESP32-S3 <em>通用烧录</em> &amp; 诊断</h1>
+      <p class="lead">支持任意 ESP32-S3 bin 文件或 URL · 一键烧录诊断固件 · 串口终端实时查看</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-inner">
+      <div class="panels">
+
+        <!-- Flash -->
+        <div class="panel-card">
+          <h2>固件烧录</h2>
+          <div class="fw-row">
+            <button class="secondary file-btn" onclick="pickFile()">选择固件</button>
+            <input type="text" id="fwPath" placeholder="选择 .bin 文件 或 输入固件下载 URL" oninput="onPathChange()">
+            <button id="flashBtn" onclick="doFlash()" class="primary" disabled style="min-width:100px">开始烧录</button>
+          </div>
+          <input type="file" id="fwFile" accept=".bin" style="display:none" onchange="onFilePicked(event)">
+
+          <div class="progress-track"><span class="fill" id="pbar"></span></div>
+          <div id="statusLine" style="font-size:12px;color:var(--muted);margin-bottom:4px">等待选择固件...</div>
+
+          <div class="flash-log" id="log"><div style="color:#a0b8d0">日志会显示在这里。</div></div>
+
+          <div class="diag-section">
+            <h2 style="font-size:14px;margin-bottom:8px">诊断硬件</h2>
+            <div class="diag-row">
+              <button id="diagBtn" onclick="doDiag()" class="diag">开始诊断</button>
+              <button onclick="downloadDiag()" class="secondary">下载诊断固件</button>
+            </div>
+            <div class="diag-sha" id="diagSha">正在计算 SHA256...</div>
+          </div>
+        </div>
+
+        <!-- Serial -->
+        <div class="panel-card">
+          <h2>串口终端</h2>
+          <div class="serial-controls">
+            <button id="serialConnectBtn" onclick="serialConnect()" class="primary">连接设备</button>
+            <button id="serialDisconnectBtn" onclick="serialDisconnect()" disabled>断开</button>
+            <select id="baudRate">
+              <option value="115200">115200</option>
+              <option value="921600">921600</option>
+              <option value="460800">460800</option>
+              <option value="230400">230400</option>
+            </select>
+            <button onclick="serialClear()" class="secondary">清屏</button>
+          </div>
+          <div class="serial-term" id="serialTerm"></div>
+          <div class="serial-input-line">
+            <input type="text" id="cmdInput" placeholder="输入命令后按回车发送..."
+                   onkeydown="if(event.key==='Enter')serialSend()">
+            <button onclick="serialSend()">发送</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="section-inner" style="display:flex;justify-content:center;gap:24px">
+    <span>StickS3 Toolkit · ESP32-S3 · M5Stack StickS3</span>
+    <a href="https://github.com/whitefirer/sticks3-toolkit" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none">GitHub</a>
+    <a href="https://whitefirer.org" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none">Blog</a>
+  </div>
+</footer>
+
+<script type="module">
+import { ESPLoader, Transport } from 'https://unpkg.com/esptool-js@0.6.0/bundle.js';
+
+const DIAG_FW = 'sticks3-toolkit-merged.bin';
+let device, transport, fwData = null, fwSource = ''; // '' = none, 'file' or 'url'
+let flashing = false;
+let logFirst = true;
+
+// ── Log & progress ──────────────────────
+function log(msg, cls) {
+  const el = document.getElementById('log');
+  if (logFirst) { el.innerHTML = ''; logFirst = false; }
+  const div = document.createElement('div');
+  div.textContent = msg;
+  if (cls) div.className = cls;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function setProgress(pct, label) {
+  document.getElementById('pbar').style.width = pct + '%';
+  if (label) setStatus(label);
+}
+function setStatus(msg) {
+  const el = document.getElementById('statusLine');
+  el.textContent = flashingLabel ? flashingLabel + ' — ' + msg : msg;
+}
+
+// ── File picker ─────────────────────────
+window.pickFile = function() { document.getElementById('fwFile').click(); };
+
+window.onFilePicked = async function(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  fwData = await f.arrayBuffer();
+  fwSource = 'file';
+  document.getElementById('fwPath').value = f.name;
+  document.getElementById('flashBtn').disabled = false;
+  document.getElementById('diagBtn').disabled = false;
+  setStatus('已加载: ' + f.name + ' (' + (fwData.byteLength/1024).toFixed(0) + ' KB)');
+};
+
+window.onPathChange = function() {
+  const v = document.getElementById('fwPath').value.trim();
+  document.getElementById('flashBtn').disabled = !v;
+  document.getElementById('diagBtn').disabled = !v;
+  if (!v) { fwData = null; fwSource = ''; setStatus('等待选择固件...'); }
+};
+
+// ── Shared flash logic ──────────────────
+async function getFirmware(useDiag) {
+  if (useDiag) {
+    try {
+      const r = await fetch(DIAG_FW);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.arrayBuffer();
+    } catch(e) { log('下载诊断固件失败: ' + e.message, 'err'); return null; }
+  }
+  if (fwSource === 'file') return fwData;
+  if (fwSource === 'url' || /^https?:\/\//.test(document.getElementById('fwPath').value.trim())) {
+    try {
+      const r = await fetch(document.getElementById('fwPath').value.trim());
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.arrayBuffer();
+    } catch(e) { log('下载固件失败: ' + e.message, 'err'); return null; }
+  }
+  return fwData;
+}
+
+let flashingLabel = '';
+
+async function doFlashInternal(data, label, sourceName) {
+  flashing = true;
+  flashingLabel = sourceName;
+  const fb = document.getElementById('flashBtn');
+  fb.disabled = true; fb.textContent = '烧录中...';
+  document.getElementById('diagBtn').disabled = true;
+  setProgress(0, '');
+
+  if (serialPort) {
+    log('自动断开串口，准备烧录...');
+    serialTermWrite('--- 烧录中，自动断开 ---\n');
+    await disconnectSerial();
+  }
+
+  if (device) {
+    try { await transport?.disconnect(); } catch(e) {}
+    try { await device.close(); } catch(e) {}
+    await new Promise(r => setTimeout(r, 500));
+    device = null; transport = null;
+  }
+
+  try {
+    log('正在连接设备...');
+    device = await navigator.serial.requestPort();
+    transport = new Transport(device);
+    log('设备已连接', 'ok');
+  } catch(e) {
+    log('连接失败: ' + e.message, 'err');
+    resetButtons();
+    return;
+  }
+
+  try {
+    const esploader = new ESPLoader({
+      transport, baudrate: 115200,
+      terminal: { clean(){}, writeLine(d) { log(d); }, write(d) { log(d); } },
+    });
+    setProgress(5, '正在连接芯片...');
+    const chip = await esploader.main();
+    log('芯片: ' + chip, 'ok');
+    log(label + ': ' + (data.byteLength/1024).toFixed(0) + ' KB');
+
+    await esploader.writeFlash({
+      fileArray: [{ address: 0x0, data: new Uint8Array(data) }],
+      flashSize: '8MB', eraseAll: true, compress: true,
+      reportProgress: (fi, written, total) => {
+        setProgress(Math.round((written / total) * 100), '正在写入...');
+      },
+    });
+
+    setProgress(100, '');
+    setStatus('烧录完成');
+    log('烧录完成', 'ok');
+    await esploader.after('custom_reset', undefined, 'D0|R1|W100|R0|W500|D0');
+    log('设备已重启', 'ok');
+  } catch(e) {
+    log('烧录失败: ' + e.message, 'err');
+    setProgress(0, '');
+    setStatus('烧录失败');
+  }
+
+  try { await transport?.disconnect(); } catch(e) {}
+  try { await device?.close(); } catch(e) {}
+  device = null; transport = null;
+  resetButtons();
+
+  // Flash the serial button to prompt user
+  const sbtn = document.getElementById('serialConnectBtn');
+  sbtn.textContent = '点击重连串口';
+  sbtn.classList.add('primary');
+  let count = 0;
+  const flash = setInterval(() => {
+    sbtn.style.boxShadow = (++count % 2) ? '0 0 10px var(--accent)' : '';
+    if (count >= 12) { clearInterval(flash); sbtn.style.boxShadow = ''; sbtn.textContent = '连接设备'; }
+  }, 400);
+}
+
+function resetButtons() {
+  flashing = false;
+  flashingLabel = '';
+  const fb = document.getElementById('flashBtn');
+  fb.disabled = !document.getElementById('fwPath').value.trim();
+  fb.textContent = '开始烧录';
+  document.getElementById('diagBtn').disabled = false;
+}
+
+// ── Flash ───────────────────────────────
+window.doFlash = async function() {
+  const path = document.getElementById('fwPath').value.trim();
+  if (!path) return;
+  if (/^https?:\/\//.test(path)) fwSource = 'url';
+  const data = await getFirmware(false);
+  if (!data) return;
+  const name = fwSource === 'file' ? path.split('/').pop().split('\\').pop() : path;
+  await doFlashInternal(data, '固件', name);
+};
+
+// ── Diagnostic ──────────────────────────
+window.doDiag = async function() {
+  log('正在加载诊断固件...');
+  const data = await getFirmware(true);
+  if (!data) return;
+  await doFlashInternal(data, '诊断硬件', '诊断硬件');
+};
+
+window.downloadDiag = function() {
+  const a = document.createElement('a');
+  a.href = DIAG_FW; a.download = DIAG_FW; a.click();
+};
+
+// Load diagnostic SHA on startup
+(async function() {
+  try {
+    const r = await fetch(DIAG_FW);
+    const buf = await r.arrayBuffer();
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    const sha = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+    document.getElementById('diagSha').textContent = 'SHA256: ' + sha;
+    document.getElementById('flashBtn').disabled = false;
+    document.getElementById('diagBtn').disabled = false;
+  } catch(e) {
+    document.getElementById('diagSha').textContent = 'SHA256: 加载失败';
+  }
+})();
+
+// ── Serial ──────────────────────────────
+let serialPort, serialReader, serialWriter, serialReading = false;
+
+function serialTermWrite(msg) {
+  const el = document.getElementById('serialTerm');
+  el.textContent += msg;
+  el.scrollTop = el.scrollHeight;
+}
+
+window.serialConnect = async function() {
+  try {
+    serialPort = await navigator.serial.requestPort();
+    const baud = parseInt(document.getElementById('baudRate').value);
+    await serialPort.open({ baudRate: baud });
+    serialWriter = serialPort.writable.getWriter();
+    serialTermWrite('已连接 @ ' + baud + ' bps\n');
+    document.getElementById('serialConnectBtn').disabled = true;
+    document.getElementById('serialDisconnectBtn').disabled = false;
+    serialStartRead();
+  } catch(e) { serialTermWrite('连接失败: ' + e.message + '\n'); }
+};
+
+async function serialStartRead() {
+  serialReading = true;
+  const decoder = new TextDecoder();
+  try {
+    while (serialPort.readable && serialReading) {
+      serialReader = serialPort.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await serialReader.read();
+          if (done) break;
+          serialTermWrite(decoder.decode(value, { stream: true }));
+        }
+      } finally { serialReader.releaseLock(); }
+    }
+  } catch(e) { if (serialReading) serialTermWrite('\n读取错误: ' + e.message + '\n'); }
+}
+
+async function disconnectSerial() {
+  serialReading = false;
+  try { serialReader?.releaseLock(); } catch(e) {}
+  try { await serialWriter?.close(); } catch(e) {}
+  try { await serialPort?.close(); } catch(e) {}
+  serialPort = null;
+  document.getElementById('serialConnectBtn').disabled = false;
+  document.getElementById('serialDisconnectBtn').disabled = true;
+}
+
+window.serialDisconnect = async function() {
+  if (serialPort) serialTermWrite('--- 已断开 ---\n');
+  await disconnectSerial();
+};
+
+window.serialSend = async function() {
+  const input = document.getElementById('cmdInput');
+  const cmd = input.value + '\r\n';
+  input.value = '';
+  if (!serialWriter) { serialTermWrite('未连接设备\n'); return; }
+  await serialWriter.write(new TextEncoder().encode(cmd));
+};
+
+window.serialClear = function() { document.getElementById('serialTerm').textContent = ''; };
+</script>
+</body>
+</html>
