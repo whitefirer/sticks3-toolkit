@@ -1,6 +1,9 @@
 # StickS3 Toolkit
 
-M5Stack StickS3 硬件诊断与固件烧录工具集。
+M5Stack StickS3 硬件诊断与固件烧录工具集。  
+[English](README_EN.md)
+
+## Screenshots
 
 ## 截图
 
