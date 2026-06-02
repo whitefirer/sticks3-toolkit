@@ -19,6 +19,7 @@ jobs:
       - name: Build firmware
         run: |
           set -e
+          . /opt/esp/idf/export.sh
           cd firmware
           idf.py build
 
