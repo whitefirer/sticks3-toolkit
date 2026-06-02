@@ -22,6 +22,8 @@ jobs:
           . /opt/esp/idf/export.sh
           cd firmware
           idf.py set-target esp32s3
+          # Disable I2C debug to match local build
+          echo "CONFIG_I2C_ENABLE_DEBUG_LOG=n" >> sdkconfig.defaults
           idf.py build
 
           # Merge into single binary for web-flash
