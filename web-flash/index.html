@@ -78,7 +78,7 @@ button.diag:hover:not(:disabled){background:var(--accent);color:#fff}
 
 .serial-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .serial-controls select{background:var(--card);color:var(--ink);border:1px solid var(--border);
-  border-radius:6px;padding:5px 6px;font-size:11px;font:inherit}
+  border-radius:6px;padding:5px 6px;font-size:11px;font-family:inherit}
 .serial-term{min-height:320px;max-height:440px;padding:10px;overflow:auto;
   border:1px solid var(--border);border-radius:8px;color:#a0b8d0;background:var(--log-bg);
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;
@@ -128,9 +128,9 @@ footer a{color:var(--accent);text-decoration:none}
           <input type="file" id="fwFile" accept=".bin" style="display:none" onchange="onFilePicked(event)">
 
           <div class="progress-track"><span class="fill" id="pbar"></span></div>
-          <div id="statusLine" style="font-size:12px;color:var(--muted);margin-bottom:4px">等待选择固件...</div>
+          <div id="statusLine" style="font-size:12px;color:var(--muted);margin-bottom:4px" data-t="waiting">等待选择固件...</div>
 
-          <div class="flash-log" id="log"><div style="color:#a0b8d0">日志会显示在这里。</div></div>
+          <div class="flash-log" id="log"><div style="color:#a0b8d0" data-t="flashLog">日志会显示在这里。</div></div>
 
           <div class="diag-section">
             <h2 style="font-size:14px;margin-bottom:8px" data-t="diagTitle">诊断硬件</h2>
@@ -139,10 +139,11 @@ footer a{color:var(--accent);text-decoration:none}
               <button onclick="downloadDiag()" class="secondary" data-t="downloadDiag">下载诊断固件</button>
             </div>
             <div class="diag-sha" id="diagSha">计算 SHA256 中...</div>
-            <dl style="display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:11px;line-height:1.5;margin-top:10px">
-              <dt style="color:var(--accent);font-weight:600" data-t="usage1k">A 键</dt><dd style="color:var(--muted)" data-t="usage1v">重新扫描 I2C 总线</dd>
-              <dt style="color:var(--accent);font-weight:600" data-t="usage2k">B 键</dt><dd style="color:var(--muted)" data-t="usage2v">六轴传感器实时数据</dd>
-              <dt style="color:var(--accent);font-weight:600" data-t="usage3k">烧录</dt><dd style="color:var(--muted)" data-t="usage3v">任意 ESP32-S3 bin 或 URL</dd>
+            <div style="font-size:12px;color:var(--accent);font-weight:600;margin-top:10px;margin-bottom:2px" data-t="usageTitle">使用说明</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:2px" data-t="usageDesc">点击"开始诊断"后将烧录硬件诊断固件，烧录成功后按以下按键操作：</div>
+            <dl style="display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:11px;line-height:1.5;margin-top:4px">
+              <dt style="color:var(--accent);font-weight:600" data-t="usage1k">A 键</dt><dd style="color:var(--muted)" data-t="usage1v">重新扫描 I2C 总线，显示检测到的设备</dd>
+              <dt style="color:var(--accent);font-weight:600" data-t="usage2k">B 键</dt><dd style="color:var(--muted)" data-t="usage2v">进入 BMI270 六轴传感器实时数据</dd>
             </dl>
           </div>
         </div>
@@ -184,10 +185,10 @@ const T = {
   zh: {
     hero:'ESP32-S3 <em>通用烧录</em>', heroEm:'通用烧录',
     heroLead:'支持任意 bin 文件或 URL · 一键诊断硬件 · 串口终端实时查看',
-    usageTitle:'诊断固件使用说明',
-    usage1k:'A 键', usage1v:'重新扫描 I2C 总线，屏幕显示检测到的设备',
-    usage2k:'B 键', usage2v:'进入 BMI270 六轴传感器实时数据显示（加速度 + 陀螺仪）',
-    usage3k:'烧录', usage3v:'选择任意 ESP32-S3 bin 文件或输入 URL，点击开始烧录即可',
+    usageTitle:'使用说明',
+    usageDesc:'点击"开始诊断"后将烧录硬件诊断固件，烧录成功后按以下按键操作：',
+    usage1k:'A 键', usage1v:'重新扫描 I2C 总线，显示检测到的设备',
+    usage2k:'B 键', usage2v:'进入 BMI270 六轴传感器实时数据',
     flashTitle:'固件烧录', pickFile:'选择固件', flashBtn:'开始烧录', flashBtnFlashing:'烧录中...',
     fwPlaceholder:'选择 .bin 文件 或 输入固件下载 URL',
     diagTitle:'诊断硬件', diagBtn:'开始诊断', downloadDiag:'下载诊断固件',
@@ -204,10 +205,10 @@ const T = {
   en: {
     hero:'ESP32-S3 <em>Flasher</em> &amp; Diagnostics', heroEm:'Flasher',
     heroLead:'Any ESP32-S3 bin file or URL · diagnostics in one click · serial terminal',
-    usageTitle:'Diagnostic Firmware Usage',
-    usage1k:'Button A', usage1v:'Rescan I2C bus, results shown on device screen',
-    usage2k:'Button B', usage2v:'Enter BMI270 6-axis IMU live data (accel + gyro)',
-    usage3k:'Flashing', usage3v:'Select any ESP32-S3 bin file or paste a URL, then start flashing',
+    usageTitle:'Usage',
+    usageDesc:'Click "Run Diagnostics" to flash the diagnostic firmware. After flashing, use:',
+    usage1k:'Button A', usage1v:'Rescan I2C bus, show detected devices',
+    usage2k:'Button B', usage2v:'BMI270 6-axis IMU live data',
     flashTitle:'Firmware Flash', pickFile:'Select File', flashBtn:'Start Flash', flashBtnFlashing:'Flashing...',
     fwPlaceholder:'Select .bin file or paste firmware URL',
     diagTitle:'Diagnostics', diagBtn:'Run Diagnostics', downloadDiag:'Download Firmware',
@@ -233,13 +234,6 @@ function applyI18n() {
     el.placeholder = T[lang][el.getAttribute('data-t-placeholder')];
   });
   document.getElementById('langBtn').textContent = lang === 'zh' ? 'EN' : '中文';
-  // Update dynamic text
-  updateDynamicText();
-}
-function updateDynamicText() {
-  document.getElementById('flashBtn').textContent = flashing ? t('flashBtnFlashing') : t('flashBtn');
-  const log = document.getElementById('log');
-  if (log.firstChild && log.firstChild.textContent === T.zh.flashLog) log.firstChild.textContent = t('flashLog');
 }
 window.toggleLang = function() { lang = lang === 'zh' ? 'en' : 'zh'; applyI18n(); };
 applyI18n();
