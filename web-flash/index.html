@@ -78,7 +78,7 @@ button.diag:hover:not(:disabled){background:var(--accent);color:#fff}
 
 .serial-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .serial-controls select{background:var(--card);color:var(--ink);border:1px solid var(--border);
-  border-radius:6px;padding:5px 8px;font-size:13px;font:inherit}
+  border-radius:6px;padding:5px 6px;font-size:11px;font:inherit}
 .serial-term{min-height:320px;max-height:440px;padding:10px;overflow:auto;
   border:1px solid var(--border);border-radius:8px;color:#a0b8d0;background:var(--log-bg);
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;
@@ -115,17 +115,6 @@ footer a{color:var(--accent);text-decoration:none}
     </div>
   </section>
 
-  <section class="usage">
-    <div class="section-inner">
-      <h2 data-t="usageTitle">诊断固件使用说明</h2>
-      <dl>
-        <dt data-t="usage1k">A 键</dt><dd data-t="usage1v">重新扫描 I2C 总线，屏幕显示检测到的设备</dd>
-        <dt data-t="usage2k">B 键</dt><dd data-t="usage2v">进入 BMI270 六轴传感器实时数据显示（加速度 + 陀螺仪）</dd>
-        <dt data-t="usage3k">烧录</dt><dd data-t="usage3v">选择任意 ESP32-S3 bin 文件或输入 URL，点击开始烧录即可</dd>
-      </dl>
-    </div>
-  </section>
-
   <section>
     <div class="section-inner">
       <div class="panels">
@@ -150,6 +139,11 @@ footer a{color:var(--accent);text-decoration:none}
               <button onclick="downloadDiag()" class="secondary" data-t="downloadDiag">下载诊断固件</button>
             </div>
             <div class="diag-sha" id="diagSha">计算 SHA256 中...</div>
+            <dl style="display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:11px;line-height:1.5;margin-top:10px">
+              <dt style="color:var(--accent);font-weight:600" data-t="usage1k">A 键</dt><dd style="color:var(--muted)" data-t="usage1v">重新扫描 I2C 总线</dd>
+              <dt style="color:var(--accent);font-weight:600" data-t="usage2k">B 键</dt><dd style="color:var(--muted)" data-t="usage2v">六轴传感器实时数据</dd>
+              <dt style="color:var(--accent);font-weight:600" data-t="usage3k">烧录</dt><dd style="color:var(--muted)" data-t="usage3v">任意 ESP32-S3 bin 或 URL</dd>
+            </dl>
           </div>
         </div>
 
