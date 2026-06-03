@@ -21,6 +21,13 @@ jobs:
           set -e
           . /opt/esp/idf/export.sh
           cd firmware
+          # Disable I2C debug before set-target reads defaults
+          if grep -q "I2C_ENABLE_DEBUG_LOG" sdkconfig.defaults; then
+            sed -i 's/CONFIG_I2C_ENABLE_DEBUG_LOG=.*/# CONFIG_I2C_ENABLE_DEBUG_LOG is not set/' sdkconfig.defaults
+          else
+            echo "# CONFIG_I2C_ENABLE_DEBUG_LOG is not set" >> sdkconfig.defaults
+          fi
+          idf.py set-target esp32s3
           idf.py build
 
           # Merge
