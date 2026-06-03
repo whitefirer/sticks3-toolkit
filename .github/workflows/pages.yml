@@ -29,11 +29,6 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Download latest firmware
-        run: |
-          curl -sL https://github.com/whitefirer/sticks3-toolkit/releases/latest/download/sticks3-toolkit-merged.bin \
-            -o web-flash/sticks3-toolkit-merged.bin || echo "No release firmware yet"
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

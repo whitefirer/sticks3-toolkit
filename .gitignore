@@ -17,9 +17,8 @@ __pycache__/
 *.swo
 *~
 
-# Generated files (keep merged bin for web-flash)
+# Generated web-flash files
 web-flash/*.bin
-!web-flash/sticks3-toolkit-merged.bin
 web-flash/fw-meta.json
 
 # OS

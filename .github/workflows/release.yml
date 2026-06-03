@@ -21,12 +21,9 @@ jobs:
           set -e
           . /opt/esp/idf/export.sh
           cd firmware
-          idf.py set-target esp32s3
-          # Disable I2C debug to match local build
-          echo "# CONFIG_I2C_ENABLE_DEBUG_LOG is not set" >> sdkconfig.defaults
           idf.py build
 
-          # Merge into single binary for web-flash
+          # Merge
           mkdir -p ../web-flash
           esptool.py --chip esp32s3 merge_bin \
             -o ../web-flash/sticks3-toolkit-merged.bin \
@@ -35,25 +32,17 @@ jobs:
             0x8000 build/partition_table/partition-table.bin \
             0x10000 build/sticks3-toolkit.bin
 
-          cp build/sticks3-toolkit.bin ../web-flash/sticks3-toolkit.bin
-
-          # SHA256 + meta
           SHA256=$(sha256sum ../web-flash/sticks3-toolkit-merged.bin | awk '{print $1}')
-          SIZE=$(stat -c%s ../web-flash/sticks3-toolkit-merged.bin)
-          VERSION="${GITHUB_REF_NAME:-$(date +%Y%m%d-%H%M)}"
-
-          cat > ../web-flash/fw-meta.json << JSONEOF
-          {
-            "version": "$VERSION",
-            "sha256": "$SHA256",
-            "size": $SIZE,
-            "url": "sticks3-toolkit-merged.bin"
-          }
-          JSONEOF
-
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=${GITHUB_REF_NAME:-snapshot}" >> $GITHUB_OUTPUT
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
         id: build
+
+      - name: Commit firmware to repo (for Pages)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -f web-flash/sticks3-toolkit-merged.bin
+          git diff --cached --quiet || (git commit -m "release: ${{ steps.build.outputs.version }}" && git push origin HEAD:master)
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
